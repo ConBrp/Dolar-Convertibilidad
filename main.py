@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import json
+import pandas as pd
 import pdfplumber
 import requests
 from bs4 import BeautifulSoup
@@ -13,11 +15,14 @@ response = requests.get(url)
 with open("example.pdf", "wb") as f:
     f.write(response.content)
 
-# Se busca el precio de venta del dólar blue en una página reconocida.
-response = requests.get("https://www.cronista.com/MercadosOnline/moneda.html?id=ARSB")
-soup = BeautifulSoup(response.text, "html.parser")
-dolar_blue = soup.find_all("div", "sell-value")[0].text
-blue_dolar = float(dolar_blue[1:].replace(".", "").replace(",", "."))
+# Se busca el precio del dólar blue.
+response = requests.get("https://api.bluelytics.com.ar/v2/evolution.json")
+data = json.loads(response.text)
+df = pd.DataFrame(data)
+df = df[df["source"]=="Blue"]
+df = df.drop("source", axis=1)
+blue_dolar = (df.iloc[0]["value_sell"] + df.iloc[0]["value_buy"])/2
+fecha_blue = df.iloc[0]["date"]
 
 # Se busca el precio de venta del dólar oficial en el Banco Nación de la República Argentina.
 response = requests.get("https://www.bna.com.ar/Personas")
