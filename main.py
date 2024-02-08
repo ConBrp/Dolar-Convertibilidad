@@ -5,13 +5,10 @@ import pdfplumber
 import requests
 from bs4 import BeautifulSoup
 
-# URL del PDF a descargar, Informe diario del BCRA.
+# Descarga de datos del BCRA.
+
 url = "https://www.bcra.gob.ar/Pdfs/PublicacionesEstadisticas/infomondiae.pdf"
-
-# Descarga el archivo PDF.
 response = requests.get(url)
-
-# Guarda el archivo en disco.
 with open("example.pdf", "wb") as f:
     f.write(response.content)
 
